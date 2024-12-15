@@ -9,6 +9,7 @@
 /versions
 /world
 /logs
+/minecraft_server
 
 # Configuration files
 banned-ips.json
@@ -24,3 +25,4 @@ eula.txt
 .DS_Store
 .env
 *.log
+
