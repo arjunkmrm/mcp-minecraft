@@ -9,7 +9,7 @@
 /versions
 /world
 /logs
-/minecraft_server
+/minecraft-server
 
 # Configuration files
 banned-ips.json
