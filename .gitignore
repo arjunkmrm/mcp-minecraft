@@ -6,7 +6,6 @@
 /libraries
 
 # Server files
-/minecraft-server
 /versions
 /world
 /logs
