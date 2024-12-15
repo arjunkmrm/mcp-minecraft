@@ -1,0 +1,22 @@
+{
+  "name": "minecraft-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node --esm src/index.ts",
+    "dev": "ts-node-dev --esm --respawn src/index.ts",
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/node": "^22.10.2",
+    "minecraft-protocol": "^1.51.0",
+    "mineflayer": "^4.23.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}

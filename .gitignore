@@ -1,0 +1,27 @@
+# Build output
+/dist
+
+# Dependencies
+/node_modules
+/libraries
+
+# Server files
+/minecraft-server
+/versions
+/world
+/logs
+
+# Configuration files
+banned-ips.json
+banned-players.json
+ops.json
+package-lock.json
+server.properties
+usercache.json
+whitelist.json
+eula.txt
+
+# IDE and system files
+.DS_Store
+.env
+*.log
