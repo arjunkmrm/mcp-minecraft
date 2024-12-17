@@ -41,6 +41,28 @@ export class ServerManager extends EventEmitter {
     this.emit('log', 'EULA accepted automatically');
   }
 
+  private ensureServerProperties(): void {
+    // Get the directory containing the server JAR
+    const serverDir = path.dirname(this.config.serverJarPath);
+    const propsPath = path.join(serverDir, 'server.properties');
+
+    // Create or update server.properties
+    let properties = '';
+    if (fs.existsSync(propsPath)) {
+      properties = fs.readFileSync(propsPath, 'utf8');
+      // Replace online-mode if it exists
+      properties = properties.replace(/^online-mode=.*$/m, 'online-mode=false');
+    }
+    
+    // Add online-mode if it doesn't exist
+    if (!properties.includes('online-mode=')) {
+      properties += '\nonline-mode=false';
+    }
+
+    fs.writeFileSync(propsPath, properties, 'utf8');
+    this.emit('log', 'Server properties updated for offline mode');
+  }
+
   public async start(): Promise<void> {
     if (this.isRunning) {
       throw new Error('Server is already running');
@@ -56,6 +78,7 @@ export class ServerManager extends EventEmitter {
         // Get the directory containing the server JAR
         const serverDir = path.dirname(this.config.serverJarPath);
         this.ensureEulaAccepted();
+        this.ensureServerProperties();
 
         this.process = spawn('java', [
           `-Xmx${this.config.memoryAllocation}`,
