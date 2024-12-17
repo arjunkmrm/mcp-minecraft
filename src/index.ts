@@ -6,16 +6,7 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import * as fs from 'fs';
 
-// Get the current working directory where the user ran the command
-const userCwd = process.cwd();
-const serverDir = path.join(userCwd, 'minecraft-server');
-
-// Create server directory if it doesn't exist
-if (!fs.existsSync(serverDir)) {
-  console.log('Creating minecraft-server directory...');
-  fs.mkdirSync(serverDir, { recursive: true });
-}
-
+// Get the server directory from the provided JAR path
 const argv = yargs(hideBin(process.argv))
   .option('server-jar', {
     alias: 'j',
@@ -26,6 +17,8 @@ const argv = yargs(hideBin(process.argv))
   .scriptName('minecraft-mcp')
   .help()
   .parseSync();
+
+const serverDir = path.dirname(argv.serverJar);
 
 // Check if server.jar exists
 if (!fs.existsSync(argv.serverJar)) {
