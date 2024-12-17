@@ -15,11 +15,11 @@ export class Application {
   private transport: StdioServerTransport | null = null;
 
   constructor(config: ApplicationConfig) {
-    // Initialize with default config
+    // Initialize with config from CLI
     this.serverManager = new ServerManager({
       maxPlayers: 10,
       port: 25565,
-      serverJarPath: path.join(process.cwd(), 'minecraft-server/server.jar'),
+      serverJarPath: config.serverJarPath,
       memoryAllocation: '2G',
       username: 'MCPBot',
       version: '1.21'
