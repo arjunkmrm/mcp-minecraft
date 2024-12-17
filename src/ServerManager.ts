@@ -2,6 +2,7 @@ import { spawn, ChildProcess } from 'child_process';
 import { EventEmitter } from 'events';
 import { MinecraftServerConfig } from './types/config.js';
 import * as fs from 'fs';
+import path from 'path';
 
 export class ServerManager extends EventEmitter {
   private process: ChildProcess | null = null;
@@ -30,6 +31,16 @@ export class ServerManager extends EventEmitter {
     };
   }
 
+  private ensureEulaAccepted(): void {
+    // Get the directory containing the server JAR
+    const serverDir = path.dirname(this.config.serverJarPath);
+    const eulaPath = path.join(serverDir, 'eula.txt');
+
+    // Create or update eula.txt
+    fs.writeFileSync(eulaPath, 'eula=true', 'utf8');
+    this.emit('log', 'EULA accepted automatically');
+  }
+
   public async start(): Promise<void> {
     if (this.isRunning) {
       throw new Error('Server is already running');
@@ -41,6 +52,8 @@ export class ServerManager extends EventEmitter {
           reject(new Error(`Server JAR not found at path: ${this.config.serverJarPath}`));
           return;
         }
+
+        this.ensureEulaAccepted();
 
         this.process = spawn('java', [
           `-Xmx${this.config.memoryAllocation}`,
