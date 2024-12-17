@@ -189,4 +189,41 @@ export class ProtocolHandler extends EventEmitter {
       throw new Error(`Failed to get block info: ${error}`);
     }
   }
+
+  public async selectSlot(slot: number): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    if (slot < 0 || slot > 8) throw new Error('Slot must be between 0 and 8');
+    
+    try {
+      await this.bot.setQuickBarSlot(slot);
+    } catch (error) {
+      throw new Error(`Failed to select slot: ${error}`);
+    }
+  }
+
+  public async getInventory(): Promise<any> {
+    if (!this.bot) throw new Error('Bot not connected');
+    
+    const items = this.bot.inventory.items();
+    return items.map(item => ({
+      name: item.name,
+      count: item.count,
+      slot: item.slot,
+      displayName: item.displayName
+    }));
+  }
+
+  public async equipItem(itemName: string, destination?: string): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    
+    try {
+        const item = this.bot.inventory.items().find(item => item.name.includes(itemName));
+        if (!item) throw new Error(`Item ${itemName} not found in inventory`);
+        
+        const equipDestination: mineflayer.EquipmentDestination | null = destination as mineflayer.EquipmentDestination || null;
+        await this.bot.equip(item, equipDestination);
+    } catch (error) {
+        throw new Error(`Failed to equip item: ${error}`);
+    }
+  }
 } 

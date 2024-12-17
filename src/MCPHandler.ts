@@ -182,6 +182,44 @@ export class MCPHandler {
             },
             required: ["x", "y", "z"]
           }
+        },
+        {
+          name: "selectSlot",
+          description: "Select a hotbar slot (0-8)",
+          inputSchema: {
+            type: "object",
+            properties: {
+              slot: { 
+                type: "number",
+                minimum: 0,
+                maximum: 8
+              }
+            },
+            required: ["slot"]
+          }
+        },
+        {
+          name: "getInventory",
+          description: "Get contents of bot's inventory",
+          inputSchema: {
+            type: "object",
+            properties: {}
+          }
+        },
+        {
+          name: "equipItem",
+          description: "Equip an item by name",
+          inputSchema: {
+            type: "object",
+            properties: {
+              itemName: { type: "string" },
+              destination: { 
+                type: "string",
+                enum: ["hand", "head", "torso", "legs", "feet"]
+              }
+            },
+            required: ["itemName"]
+          }
         }
       ]
     }));
@@ -256,6 +294,35 @@ export class MCPHandler {
           const blockInfo = await this.protocolHandler.getBlockInfo(x, y, z);
           return {
             content: [{ type: "text", text: JSON.stringify(blockInfo, null, 2) }]
+          };
+        }
+
+        case "selectSlot": {
+          const { slot } = request.params.arguments as { slot: number };
+          await this.protocolHandler.selectSlot(slot);
+          return {
+            content: [{ type: "text", text: `Selected slot ${slot}` }]
+          };
+        }
+
+        case "getInventory": {
+          const inventory = await this.protocolHandler.getInventory();
+          return {
+            content: [{ type: "text", text: JSON.stringify(inventory, null, 2) }]
+          };
+        }
+
+        case "equipItem": {
+          const { itemName, destination } = request.params.arguments as { 
+            itemName: string, 
+            destination?: string 
+          };
+          await this.protocolHandler.equipItem(itemName, destination);
+          return {
+            content: [{ 
+              type: "text", 
+              text: `Equipped ${itemName}${destination ? ` to ${destination}` : ''}`
+            }]
           };
         }
 
