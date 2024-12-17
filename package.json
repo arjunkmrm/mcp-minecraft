@@ -1,6 +1,6 @@
 {
   "name": "mcp-minecraft",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "type": "module",
   "main": "index.js",
   "scripts": {
