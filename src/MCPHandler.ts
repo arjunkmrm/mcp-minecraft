@@ -276,6 +276,51 @@ export class MCPHandler {
             type: "object",
             properties: {}
           }
+        },
+        {
+          name: "lookAt",
+          description: "Make the bot look at specific coordinates",
+          inputSchema: {
+            type: "object",
+            properties: {
+              x: { type: "number" },
+              y: { type: "number" },
+              z: { type: "number" }
+            },
+            required: ["x", "y", "z"]
+          }
+        },
+        {
+          name: "followPlayer",
+          description: "Follow a specific player",
+          inputSchema: {
+            type: "object",
+            properties: {
+              playerName: { type: "string" }
+            },
+            required: ["playerName"]
+          }
+        },
+        {
+          name: "stopFollowing",
+          description: "Stop following current target",
+          inputSchema: {
+            type: "object",
+            properties: {}
+          }
+        },
+        {
+          name: "goToPosition",
+          description: "Navigate to specific coordinates",
+          inputSchema: {
+            type: "object",
+            properties: {
+              x: { type: "number" },
+              y: { type: "number" },
+              z: { type: "number" }
+            },
+            required: ["x", "y", "z"]
+          }
         }
       ]
     }));
@@ -417,6 +462,37 @@ export class MCPHandler {
           await this.protocolHandler.stopUsingItem();
           return {
             content: [{ type: "text", text: "Stopped using item" }]
+          };
+        }
+
+        case "lookAt": {
+          const { x, y, z } = request.params.arguments as { x: number, y: number, z: number };
+          await this.protocolHandler.lookAt(x, y, z);
+          return {
+            content: [{ type: "text", text: `Looking at position (${x}, ${y}, ${z})` }]
+          };
+        }
+
+        case "followPlayer": {
+          const { playerName } = request.params.arguments as { playerName: string };
+          await this.protocolHandler.followPlayer(playerName);
+          return {
+            content: [{ type: "text", text: `Following player: ${playerName}` }]
+          };
+        }
+
+        case "stopFollowing": {
+          await this.protocolHandler.stopFollowing();
+          return {
+            content: [{ type: "text", text: "Stopped following" }]
+          };
+        }
+
+        case "goToPosition": {
+          const { x, y, z } = request.params.arguments as { x: number, y: number, z: number };
+          await this.protocolHandler.goToPosition(x, y, z);
+          return {
+            content: [{ type: "text", text: `Moving to position (${x}, ${y}, ${z})` }]
           };
         }
 

@@ -1,7 +1,7 @@
 import * as mineflayer from 'mineflayer';
 import { EventEmitter } from 'events';
 import { Vec3 } from 'vec3';
-import { Block } from 'prismarine-block';
+import { pathfinder, goals } from 'mineflayer-pathfinder';
 
 export interface BotConfig {
   host: string;
@@ -34,6 +34,9 @@ export class ProtocolHandler extends EventEmitter {
           username: this.config.username,
           version: this.config.version
         });
+
+        // Load the pathfinder plugin
+        this.bot.loadPlugin(pathfinder);
 
         this.setupEventHandlers();
 
@@ -293,6 +296,49 @@ export class ProtocolHandler extends EventEmitter {
       await this.bot.deactivateItem();
     } catch (error) {
       throw new Error(`Failed to stop using item: ${error}`);
+    }
+  }
+
+  public async lookAt(x: number, y: number, z: number): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    
+    try {
+      await this.bot.lookAt(new Vec3(x, y, z));
+    } catch (error) {
+      throw new Error(`Failed to look at position: ${error}`);
+    }
+  }
+
+  public async followPlayer(playerName: string): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    
+    try {
+        const player = this.bot.players[playerName]?.entity;
+        if (!player) throw new Error('Player not found');
+
+        // Follow at 2 blocks distance
+        await this.bot.pathfinder.goto(
+            new goals.GoalFollow(player, 2)
+        );
+    } catch (error) {
+        throw new Error(`Failed to follow player: ${error}`);
+    }
+  }
+
+  public async stopFollowing(): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    this.bot.pathfinder.stop();
+  }
+
+  public async goToPosition(x: number, y: number, z: number): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    
+    try {
+        await this.bot.pathfinder.goto(
+            new goals.GoalBlock(x, y, z)
+        );
+    } catch (error) {
+        throw new Error(`Failed to go to position: ${error}`);
     }
   }
 } 
