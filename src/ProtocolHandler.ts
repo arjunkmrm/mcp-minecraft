@@ -260,4 +260,39 @@ export class ProtocolHandler extends EventEmitter {
                 : null // Handle the case where position might be null
         }));
   }
+
+  public async attack(entityName: string): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    
+    try {
+      const entity = Object.values(this.bot.entities)
+        .find(e => e.name === entityName && 
+          e.position.distanceTo(this.bot!.entity.position) <= 4);
+      
+      if (!entity) throw new Error('Entity not found or too far');
+      await this.bot.attack(entity);
+    } catch (error) {
+      throw new Error(`Failed to attack: ${error}`);
+    }
+  }
+
+  public async useItem(hand: 'right' | 'left' = 'right'): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    
+    try {
+      await this.bot.activateItem(hand === 'right');
+    } catch (error) {
+      throw new Error(`Failed to use item: ${error}`);
+    }
+  }
+
+  public async stopUsingItem(): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    
+    try {
+      await this.bot.deactivateItem();
+    } catch (error) {
+      throw new Error(`Failed to stop using item: ${error}`);
+    }
+  }
 } 

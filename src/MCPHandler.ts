@@ -243,6 +243,39 @@ export class MCPHandler {
               }
             }
           }
+        },
+        {
+          name: "attack",
+          description: "Attack a nearby entity by name",
+          inputSchema: {
+            type: "object",
+            properties: {
+              entityName: { type: "string" }
+            },
+            required: ["entityName"]
+          }
+        },
+        {
+          name: "useItem",
+          description: "Use/activate the currently held item",
+          inputSchema: {
+            type: "object",
+            properties: {
+              hand: { 
+                type: "string",
+                enum: ["right", "left"],
+                default: "right"
+              }
+            }
+          }
+        },
+        {
+          name: "stopUsingItem",
+          description: "Stop using/deactivate the current item",
+          inputSchema: {
+            type: "object",
+            properties: {}
+          }
         }
       ]
     }));
@@ -361,6 +394,29 @@ export class MCPHandler {
           const entities = await this.protocolHandler.getNearbyEntities(range);
           return {
             content: [{ type: "text", text: JSON.stringify(entities, null, 2) }]
+          };
+        }
+
+        case "attack": {
+          const { entityName } = request.params.arguments as { entityName: string };
+          await this.protocolHandler.attack(entityName);
+          return {
+            content: [{ type: "text", text: `Attacked entity: ${entityName}` }]
+          };
+        }
+
+        case "useItem": {
+          const { hand = 'right' } = request.params.arguments as { hand?: 'right' | 'left' };
+          await this.protocolHandler.useItem(hand);
+          return {
+            content: [{ type: "text", text: `Used item in ${hand} hand` }]
+          };
+        }
+
+        case "stopUsingItem": {
+          await this.protocolHandler.stopUsingItem();
+          return {
+            content: [{ type: "text", text: "Stopped using item" }]
           };
         }
 
