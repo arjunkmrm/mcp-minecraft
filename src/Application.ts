@@ -107,4 +107,28 @@ export class Application {
     console.log('Stopping Minecraft server...');
     await this.serverManager.stop();
   }
+
+  async stop(): Promise<void> {
+    try {
+      // Disconnect MCP server
+      if (this.mcpHandler && this.transport) {
+        console.log('Stopping MCP server...');
+        await this.mcpHandler.getServer().close();
+        this.transport = null;
+      }
+
+      // Disconnect bot
+      console.log('Disconnecting bot...');
+      await this.protocolHandler.disconnect();
+
+      // Stop Minecraft server
+      console.log('Stopping Minecraft server...');
+      await this.serverManager.stop();
+
+      console.log('Cleanup complete');
+    } catch (error) {
+      console.error('Error during cleanup:', error);
+      throw error;
+    }
+  }
 } 

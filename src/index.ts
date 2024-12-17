@@ -32,15 +32,32 @@ const app = new Application({
   serverJarPath: argv.serverJar
 });
 
+// Add cleanup handler function
+const cleanup = async () => {
+  console.log('\nShutting down server...');
+  try {
+    await app.stop();
+    console.log('Server shutdown complete');
+    process.exit(0);
+  } catch (error) {
+    console.error('Error during shutdown:', error);
+    process.exit(1);
+  }
+};
+
+// Handle graceful shutdown on SIGINT and SIGTERM
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);
+
 // Add explicit error handling for uncaught exceptions
-process.on('uncaughtException', (error) => {
+process.on('uncaughtException', async (error) => {
   console.error('Uncaught Exception:', error);
-  process.exit(1);
+  await cleanup();
 });
 
-process.on('unhandledRejection', (error) => {
+process.on('unhandledRejection', async (error) => {
   console.error('Unhandled Rejection:', error);
-  process.exit(1);
+  await cleanup();
 });
 
 app.start().catch(error => {
