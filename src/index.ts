@@ -20,8 +20,8 @@ const argv = yargs(hideBin(process.argv))
   .option('server-jar', {
     alias: 'j',
     type: 'string',
-    description: 'Path to the Minecraft server JAR file',
-    default: path.join(serverDir, 'server.jar')
+    description: 'Absolute path to the Minecraft server JAR file',
+    demandOption: true
   })
   .scriptName('minecraft-mcp')
   .help()
@@ -30,9 +30,8 @@ const argv = yargs(hideBin(process.argv))
 // Check if server.jar exists
 if (!fs.existsSync(argv.serverJar)) {
   console.error('\nError: server.jar not found!');
-  console.log('\nPlease download the Minecraft server.jar (v1.21) from:');
-  console.log('https://www.minecraft.net/en-us/download/server');
-  console.log(`\nAnd place it at: ${argv.serverJar}`);
+  console.log('\nPlease provide the correct absolute path to your server.jar file (v1.21)');
+  console.log('Download from: https://www.minecraft.net/en-us/download/server');
   process.exit(1);
 }
 
