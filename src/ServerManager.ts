@@ -54,8 +54,7 @@ export class ServerManager extends EventEmitter {
     // Define our server properties for a simple plains world
     const serverProperties = {
       'online-mode': 'false',
-      'level-type': 'flat',
-      'generator-settings': '{"biome":"plains","layers":[{"block":"bedrock","height":1},{"block":"dirt","height":2},{"block":"grass_block","height":1}]}',
+      'level-type': 'default',
       'spawn-protection': '0',
       'difficulty': 'peaceful',          // No hostile mobs
       'spawn-monsters': 'false',         // Disable monster spawning
