@@ -53,6 +53,8 @@ export class ServerManager extends EventEmitter {
           return;
         }
 
+        // Get the directory containing the server JAR
+        const serverDir = path.dirname(this.config.serverJarPath);
         this.ensureEulaAccepted();
 
         this.process = spawn('java', [
@@ -61,7 +63,9 @@ export class ServerManager extends EventEmitter {
           '-jar',
           this.config.serverJarPath,
           'nogui'
-        ]);
+        ], {
+          cwd: serverDir  // Set working directory to where server.jar is
+        });
 
         const timeout = setTimeout(() => {
           reject(new Error('Server startup timed out'));
