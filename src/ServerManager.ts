@@ -43,25 +43,44 @@ export class ServerManager extends EventEmitter {
   }
 
   private ensureServerProperties(): void {
-    // Get the directory containing the server JAR
     const serverDir = path.dirname(this.config.serverJarPath);
     const propsPath = path.join(serverDir, 'server.properties');
 
-    // Create or update server.properties
     let properties = '';
     if (fs.existsSync(propsPath)) {
       properties = fs.readFileSync(propsPath, 'utf8');
-      // Replace online-mode if it exists
-      properties = properties.replace(/^online-mode=.*$/m, 'online-mode=false');
-    }
-    
-    // Add online-mode if it doesn't exist
-    if (!properties.includes('online-mode=')) {
-      properties += '\nonline-mode=false';
     }
 
-    fs.writeFileSync(propsPath, properties, 'utf8');
-    this.emit('log', 'Server properties updated for offline mode');
+    // Define our server properties for a simple plains world
+    const serverProperties = {
+      'online-mode': 'false',
+      'level-type': 'flat',
+      'generator-settings': '{"biome":"plains","layers":[{"block":"bedrock","height":1},{"block":"dirt","height":2},{"block":"grass_block","height":1}]}',
+      'spawn-protection': '0',
+      'difficulty': 'peaceful',          // No hostile mobs
+      'spawn-monsters': 'false',         // Disable monster spawning
+      'spawn-animals': 'true',           // Enable animal spawning
+      'spawn-npcs': 'false',             // Disable villagers
+      'generate-structures': 'false',     // Disable structures (villages, temples, etc)
+      'allow-nether': 'false',           // Disable nether
+      'gamemode': 'creative',            // Set creative mode for easier building
+      'max-players': this.config.maxPlayers.toString(),
+      'server-port': this.config.port.toString(),
+      'motd': 'Peaceful Plains Server'
+    };
+
+    // Update or create each property
+    for (const [key, value] of Object.entries(serverProperties)) {
+      const regex = new RegExp(`^${key}=.*$`, 'm');
+      if (properties.match(regex)) {
+        properties = properties.replace(regex, `${key}=${value}`);
+      } else {
+        properties += `\n${key}=${value}`;
+      }
+    }
+
+    fs.writeFileSync(propsPath, properties.trim(), 'utf8');
+    this.emit('log', 'Server properties updated for peaceful plains world');
   }
 
   private normalizePath(p: string): string {
