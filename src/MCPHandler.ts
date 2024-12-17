@@ -111,6 +111,38 @@ export class MCPHandler {
             type: "object",
             properties: {}
           }
+        },
+        {
+          name: "moveForward",
+          description: "Make the bot move forward",
+          inputSchema: {
+            type: "object",
+            properties: {}
+          }
+        },
+        {
+          name: "moveBack",
+          description: "Make the bot move backward",
+          inputSchema: {
+            type: "object",
+            properties: {}
+          }
+        },
+        {
+          name: "turnLeft",
+          description: "Make the bot turn left",
+          inputSchema: {
+            type: "object",
+            properties: {}
+          }
+        },
+        {
+          name: "turnRight",
+          description: "Make the bot turn right",
+          inputSchema: {
+            type: "object",
+            properties: {}
+          }
         }
       ]
     }));
@@ -138,6 +170,30 @@ export class MCPHandler {
               type: "text",
               text: "Jumped!"
             }]
+          };
+
+        case "moveForward":
+          await this.protocolHandler.moveForward();
+          return {
+            content: [{ type: "text", text: "Moved forward" }]
+          };
+
+        case "moveBack":
+          await this.protocolHandler.moveBack();
+          return {
+            content: [{ type: "text", text: "Moved backward" }]
+          };
+
+        case "turnLeft":
+          await this.protocolHandler.turnLeft();
+          return {
+            content: [{ type: "text", text: "Turned left" }]
+          };
+
+        case "turnRight":
+          await this.protocolHandler.turnRight();
+          return {
+            content: [{ type: "text", text: "Turned right" }]
           };
 
         default:

@@ -103,4 +103,32 @@ export class ProtocolHandler extends EventEmitter {
   public isConnected(): boolean {
     return this.bot !== null;
   }
+
+  public async moveForward(): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    this.bot.setControlState('forward', true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    this.bot.setControlState('forward', false);
+  }
+
+  public async moveBack(): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    this.bot.setControlState('back', true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    this.bot.setControlState('back', false);
+  }
+
+  public async turnLeft(): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    this.bot.setControlState('left', true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    this.bot.setControlState('left', false);
+  }
+
+  public async turnRight(): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    this.bot.setControlState('right', true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    this.bot.setControlState('right', false);
+  }
 } 
