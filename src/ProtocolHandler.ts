@@ -1,6 +1,7 @@
 import * as mineflayer from 'mineflayer';
 import { EventEmitter } from 'events';
 import { Vec3 } from 'vec3';
+import { Block } from 'prismarine-block';
 
 export interface BotConfig {
   host: string;
@@ -130,5 +131,62 @@ export class ProtocolHandler extends EventEmitter {
     this.bot.setControlState('right', true);
     await new Promise(resolve => setTimeout(resolve, 500));
     this.bot.setControlState('right', false);
+  }
+
+  public async placeBlock(x: number, y: number, z: number): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    
+    try {
+      const targetPos = new Vec3(x, y, z);
+      const faceVector = new Vec3(0, 1, 0); // Default to top face
+      
+      // Get the block we're trying to place against
+      const referenceBlock = await this.bot.blockAt(targetPos);
+      if (!referenceBlock) throw new Error('No reference block found');
+      
+      await this.bot.placeBlock(referenceBlock, faceVector);
+    } catch (error) {
+      throw new Error(`Failed to place block: ${error}`);
+    }
+  }
+
+  public async digBlock(x: number, y: number, z: number): Promise<void> {
+    if (!this.bot) throw new Error('Bot not connected');
+    
+    try {
+      const targetPos = new Vec3(x, y, z);
+      const block = await this.bot.blockAt(targetPos);
+      
+      if (!block) throw new Error('No block at target position');
+      if (block.name === 'air') throw new Error('Cannot dig air');
+      
+      await this.bot.dig(block);
+    } catch (error) {
+      throw new Error(`Failed to dig block: ${error}`);
+    }
+  }
+
+  public async getBlockInfo(x: number, y: number, z: number): Promise<any> {
+    if (!this.bot) throw new Error('Bot not connected');
+    
+    try {
+      const targetPos = new Vec3(x, y, z);
+      const block = await this.bot.blockAt(targetPos);
+      
+      if (!block) throw new Error('No block at target position');
+      
+      return {
+        name: block.name,
+        type: block.type,
+        position: {
+          x: block.position.x,
+          y: block.position.y,
+          z: block.position.z
+        },
+        hardness: block.hardness
+      };
+    } catch (error) {
+      throw new Error(`Failed to get block info: ${error}`);
+    }
   }
 } 

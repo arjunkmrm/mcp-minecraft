@@ -143,6 +143,45 @@ export class MCPHandler {
             type: "object",
             properties: {}
           }
+        },
+        {
+          name: "placeBlock",
+          description: "Place a block at specified coordinates",
+          inputSchema: {
+            type: "object",
+            properties: {
+              x: { type: "number" },
+              y: { type: "number" },
+              z: { type: "number" }
+            },
+            required: ["x", "y", "z"]
+          }
+        },
+        {
+          name: "digBlock",
+          description: "Break a block at specified coordinates",
+          inputSchema: {
+            type: "object",
+            properties: {
+              x: { type: "number" },
+              y: { type: "number" },
+              z: { type: "number" }
+            },
+            required: ["x", "y", "z"]
+          }
+        },
+        {
+          name: "getBlockInfo",
+          description: "Get information about a block at specified coordinates",
+          inputSchema: {
+            type: "object",
+            properties: {
+              x: { type: "number" },
+              y: { type: "number" },
+              z: { type: "number" }
+            },
+            required: ["x", "y", "z"]
+          }
         }
       ]
     }));
@@ -195,6 +234,30 @@ export class MCPHandler {
           return {
             content: [{ type: "text", text: "Turned right" }]
           };
+
+        case "placeBlock": {
+          const { x, y, z } = request.params.arguments as { x: number, y: number, z: number };
+          await this.protocolHandler.placeBlock(x, y, z);
+          return {
+            content: [{ type: "text", text: `Placed block at (${x}, ${y}, ${z})` }]
+          };
+        }
+
+        case "digBlock": {
+          const { x, y, z } = request.params.arguments as { x: number, y: number, z: number };
+          await this.protocolHandler.digBlock(x, y, z);
+          return {
+            content: [{ type: "text", text: `Broke block at (${x}, ${y}, ${z})` }]
+          };
+        }
+
+        case "getBlockInfo": {
+          const { x, y, z } = request.params.arguments as { x: number, y: number, z: number };
+          const blockInfo = await this.protocolHandler.getBlockInfo(x, y, z);
+          return {
+            content: [{ type: "text", text: JSON.stringify(blockInfo, null, 2) }]
+          };
+        }
 
         default:
           throw new Error(`Unknown tool: ${request.params.name}`);
