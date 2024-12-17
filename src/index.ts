@@ -18,8 +18,6 @@ const argv = yargs(hideBin(process.argv))
   .help()
   .parseSync();
 
-const serverDir = path.dirname(argv.serverJar);
-
 // Check if server.jar exists
 if (!fs.existsSync(argv.serverJar)) {
   console.error('\nError: server.jar not found!');
