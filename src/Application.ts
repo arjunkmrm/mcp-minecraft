@@ -15,11 +15,13 @@ export class Application {
   private transport: StdioServerTransport | null = null;
 
   constructor(config: ApplicationConfig) {
+    const serverPath = path.resolve(config.serverJarPath);
+    
     // Initialize with config from CLI
     this.serverManager = new ServerManager({
       maxPlayers: 10,
       port: 25565,
-      serverJarPath: config.serverJarPath,
+      serverJarPath: serverPath,
       memoryAllocation: '2G',
       username: 'MCPBot',
       version: '1.21'

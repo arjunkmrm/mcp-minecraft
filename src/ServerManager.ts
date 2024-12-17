@@ -3,6 +3,7 @@ import { EventEmitter } from 'events';
 import { MinecraftServerConfig } from './types/config.js';
 import * as fs from 'fs';
 import path from 'path';
+import * as os from 'os';
 
 export class ServerManager extends EventEmitter {
   private process: ChildProcess | null = null;
@@ -63,6 +64,30 @@ export class ServerManager extends EventEmitter {
     this.emit('log', 'Server properties updated for offline mode');
   }
 
+  private normalizePath(p: string): string {
+    return path.normalize(p).toLowerCase();
+  }
+
+  private expandHome(filepath: string): string {
+    if (filepath.startsWith("~/") || filepath === "~") {
+      return path.join(os.homedir(), filepath.slice(1));
+    }
+    return filepath;
+  }
+
+  private validateServerPath(): string {
+    const expandedPath = this.expandHome(this.config.serverJarPath);
+    const absolutePath = path.isAbsolute(expandedPath) 
+      ? path.resolve(expandedPath)
+      : path.resolve(process.cwd(), expandedPath);
+    
+    if (!fs.existsSync(absolutePath)) {
+      throw new Error(`Server JAR not found at path: ${absolutePath}`);
+    }
+    
+    return absolutePath;
+  }
+
   public async start(): Promise<void> {
     if (this.isRunning) {
       throw new Error('Server is already running');
@@ -70,24 +95,23 @@ export class ServerManager extends EventEmitter {
 
     return new Promise((resolve, reject) => {
       try {
-        if (!fs.existsSync(this.config.serverJarPath)) {
-          reject(new Error(`Server JAR not found at path: ${this.config.serverJarPath}`));
-          return;
-        }
-
-        // Get the directory containing the server JAR
-        const serverDir = path.dirname(this.config.serverJarPath);
+        const serverJarPath = this.validateServerPath();
+        const serverDir = path.dirname(serverJarPath);
+        
         this.ensureEulaAccepted();
         this.ensureServerProperties();
 
+        // Use absolute paths and set proper working directory
         this.process = spawn('java', [
           `-Xmx${this.config.memoryAllocation}`,
           `-Xms${this.config.memoryAllocation}`,
           '-jar',
-          this.config.serverJarPath,
+          serverJarPath,
           'nogui'
         ], {
-          cwd: serverDir  // Set working directory to where server.jar is
+          cwd: serverDir,
+          stdio: ['pipe', 'pipe', 'pipe'],
+          detached: false // Ensure process is attached to parent
         });
 
         const timeout = setTimeout(() => {
