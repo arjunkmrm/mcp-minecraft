@@ -226,4 +226,38 @@ export class ProtocolHandler extends EventEmitter {
         throw new Error(`Failed to equip item: ${error}`);
     }
   }
+
+  public async getStatus(): Promise<any> {
+    if (!this.bot) throw new Error('Bot not connected');
+    
+    return {
+        health: this.bot.health,
+        food: this.bot.food,
+        gameMode: this.bot.game?.gameMode ?? 'unknown',
+        position: this.getPosition(),
+        isRaining: this.bot.isRaining,
+        time: {
+            timeOfDay: this.bot.time?.timeOfDay ?? 0,
+            day: this.bot.time?.day ?? 0
+        }
+    };
+  }
+
+  public async getNearbyEntities(range: number = 10): Promise<any[]> {
+    if (!this.bot) throw new Error('Bot not connected');
+    
+    return Object.values(this.bot.entities)
+        .filter(entity => {
+            if (!entity.position || !this.bot?.entity?.position) return false;
+            return entity.position.distanceTo(this.bot.entity.position) <= range;
+        })
+        .map(entity => ({
+            name: entity.name,
+            type: entity.type,
+            position: entity.position,
+            distance: entity.position && this.bot?.entity?.position 
+                ? entity.position.distanceTo(this.bot.entity.position) 
+                : null // Handle the case where position might be null
+        }));
+  }
 } 

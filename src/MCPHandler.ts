@@ -220,6 +220,29 @@ export class MCPHandler {
             },
             required: ["itemName"]
           }
+        },
+        {
+          name: "getStatus",
+          description: "Get bot's current status including health, food, position, etc.",
+          inputSchema: {
+            type: "object",
+            properties: {}
+          }
+        },
+        {
+          name: "getNearbyEntities",
+          description: "Get list of nearby entities within specified range",
+          inputSchema: {
+            type: "object",
+            properties: {
+              range: {
+                type: "number",
+                minimum: 1,
+                maximum: 100,
+                default: 10
+              }
+            }
+          }
         }
       ]
     }));
@@ -323,6 +346,21 @@ export class MCPHandler {
               type: "text", 
               text: `Equipped ${itemName}${destination ? ` to ${destination}` : ''}`
             }]
+          };
+        }
+
+        case "getStatus": {
+          const status = await this.protocolHandler.getStatus();
+          return {
+            content: [{ type: "text", text: JSON.stringify(status, null, 2) }]
+          };
+        }
+
+        case "getNearbyEntities": {
+          const { range } = request.params.arguments as { range?: number };
+          const entities = await this.protocolHandler.getNearbyEntities(range);
+          return {
+            content: [{ type: "text", text: JSON.stringify(entities, null, 2) }]
           };
         }
 
