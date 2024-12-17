@@ -54,7 +54,7 @@ export class ServerManager extends EventEmitter {
     // Define our server properties for a simple plains world
     const serverProperties = {
       'online-mode': 'false',
-      'level-type': 'default',
+      'level-type': 'flat',
       'spawn-protection': '0',
       'difficulty': 'peaceful',          // No hostile mobs
       'spawn-monsters': 'false',         // Disable monster spawning
