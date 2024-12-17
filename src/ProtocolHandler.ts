@@ -107,12 +107,21 @@ export class ProtocolHandler extends EventEmitter {
         return;
       }
 
+      // Ensure we remove all listeners to prevent memory leaks
+      bot.removeAllListeners();
+      
       bot.once('end', () => {
         this.bot = null;
+        
+        // Force quit the process after a short delay to ensure cleanup
+        setTimeout(() => {
+          process.exit(0);
+        }, 1000);
+        
         resolve();
       });
       
-      // Use end() instead of quit()
+      // Use end() instead of quit() for proper cleanup
       bot.end();
     });
   }

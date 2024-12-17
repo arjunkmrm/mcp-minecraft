@@ -7,11 +7,12 @@ A Model Context Protocol (MCP) integration for Minecraft that enables AI assista
 - Node.js 18 or higher
 - Minecraft Java Edition Server v1.21
 - Claude Desktop App
+> ⚠️ Note: Currently only tested on macOS/Linux. Windows compatibility is not guaranteed.
 
 ## Quick Start
 
 1. **Download Minecraft Server**
-   - Get the official Minecraft server (v1.21) from [minecraft.net/download/server](https://www.minecraft.net/en-us/download/server)
+   - Get the official Minecraft server (v1.21) from [minecraft.net/download/server](https://mcversions.net)
    - Save the `server.jar` file to a dedicated directory (e.g., `~/minecraft-server/`)
 
 2. **Configure Claude Desktop**
@@ -55,6 +56,25 @@ Available MCP tools:
 
 - `chat` - Send chat messages to the server
 - `jump` - Make the bot jump
+- `moveForward` - Make the bot move forward
+- `moveBack` - Make the bot move backward
+- `turnLeft` - Make the bot turn left
+- `turnRight` - Make the bot turn right
+- `placeBlock` - Place a block at specified coordinates
+- `digBlock` - Break a block at specified coordinates
+- `getBlockInfo` - Get information about a block at specified coordinates
+- `selectSlot` - Select a hotbar slot (0-8)
+- `getInventory` - Get contents of bot's inventory
+- `equipItem` - Equip an item by name to specified destination
+- `getStatus` - Get bot's current status (health, food, position, etc.)
+- `getNearbyEntities` - Get list of nearby entities within range
+- `attack` - Attack a nearby entity by name
+- `useItem` - Use/activate the currently held item
+- `stopUsingItem` - Stop using/deactivate the current item
+- `lookAt` - Make the bot look at specific coordinates
+- `followPlayer` - Follow a specific player
+- `stopFollowing` - Stop following current target
+- `goToPosition` - Navigate to specific coordinates
 
 ## Technical Details
 
@@ -82,20 +102,20 @@ Available MCP tools:
    - Verify config.json syntax
    - Check server.jar path is absolute
 
+4. **Java Process Persists After Closing**
+   - If you experience issues reconnecting after closing Claude, check for lingering Java processes
+   - You may need to manually terminate the Java process:
+     - Windows: Use Task Manager (untested)
+     - Mac/Linux: Use `ps aux | grep java` and `kill <PID>`
+   - This issue should auto-resolve in most cases with the latest version
+
 ### Logs Location
 - Server logs: Check the minecraft-server directory
 - Claude Desktop logs: `~/Library/Logs/Claude/mcp*.log`
 
-## Coming Soon
-- [ ] World interaction tools
-- [ ] Inventory management
-- [ ] Block placement/breaking
-- [ ] Entity tracking
-- [ ] Advanced navigation
-
 ## Contributing
 
-Contributions are welcome! Please check our [Contributing Guidelines](CONTRIBUTING.md) for details.
+Contributions are welcome!
 
 ## License
 
