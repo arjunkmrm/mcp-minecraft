@@ -1,7 +1,8 @@
 import * as mineflayer from 'mineflayer';
 import { EventEmitter } from 'events';
 import { Vec3 } from 'vec3';
-import { pathfinder, Movements, goals } from 'mineflayer-pathfinder';
+import pathfinderPkg from 'mineflayer-pathfinder';
+const { pathfinder, Movements, goals } = pathfinderPkg;
 
 export interface BotConfig {
   host: string;
