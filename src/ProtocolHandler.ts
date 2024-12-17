@@ -1,7 +1,7 @@
 import * as mineflayer from 'mineflayer';
 import { EventEmitter } from 'events';
 import { Vec3 } from 'vec3';
-import { pathfinder, goals } from 'mineflayer-pathfinder';
+import { pathfinder, Movements, goals } from 'mineflayer-pathfinder';
 
 export interface BotConfig {
   host: string;
@@ -37,6 +37,9 @@ export class ProtocolHandler extends EventEmitter {
 
         // Load the pathfinder plugin
         this.bot.loadPlugin(pathfinder);
+
+        // Add default movements configuration
+        this.bot.pathfinder.setMovements(new Movements(this.bot));
 
         this.setupEventHandlers();
 
