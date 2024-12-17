@@ -64,6 +64,7 @@ export class ServerManager extends EventEmitter {
       'generate-structures': 'false',     // Disable structures (villages, temples, etc)
       'allow-nether': 'false',           // Disable nether
       'gamemode': 'creative',            // Set creative mode for easier building
+      'do-daylight-cycle': 'false',
       'max-players': this.config.maxPlayers.toString(),
       'server-port': this.config.port.toString(),
       'motd': 'Peaceful Plains Server'
