@@ -4,21 +4,25 @@ A Model Context Protocol (MCP) integration for Minecraft that enables AI assista
 
 ## Prerequisites
 
-- Node.js 18 or higher
-- Minecraft Java Edition Server v1.21
-- Claude Desktop App
+1. Minecraft Java Edition v1.21
+2. Node.js 18 or higher
+3. Claude Desktop App
+
 > ⚠️ Note: Currently only tested on macOS/Linux. Windows compatibility is not guaranteed.
 
-## Quick Start
+## Installation Steps
 
-1. **Download Minecraft Server**
-   - Get the official Minecraft server (v1.21) from [minecraft.net/download/server](https://mcversions.net)
-   - Save the `server.jar` file to a dedicated directory (e.g., `~/minecraft-server/`)
+1. **Download and Setup Minecraft Server**
+   - Download Minecraft server v1.21 from [minecraft.net/download/server](https://mcversions.net)
+   - Create a dedicated directory (e.g., `~/minecraft-server/`)
+   - Place the downloaded `server.jar` file in this directory
+   - Note down the absolute path to your `server.jar` file
 
 2. **Configure Claude Desktop**
-   - Open Claude Desktop
+   - Install Claude Desktop
    - Navigate to `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - Add the MCP server configuration:   ```json
+   - Add the MCP server configuration:   
+   ```json
    {
      "mcpServers": {
        "mcp-minecraft": {
@@ -31,10 +35,14 @@ A Model Context Protocol (MCP) integration for Minecraft that enables AI assista
          ]
        }
      }
-   }   ```
+   }   
+   ```
    > ⚠️ Replace `/absolute/path/to/minecraft-server/server.jar` with your actual server.jar path
 
-3. **Connect to Server**
+3. **Launch Claude Desktop**
+   - Start Claude Desktop after completing the configuration
+
+4. **Connect to Server**
    - Launch Minecraft Java Edition
    - Select "Multiplayer"
    - Click "Add Server"
@@ -107,6 +115,7 @@ Available MCP tools:
    - You may need to manually terminate the Java process:
      - Windows: Use Task Manager (untested)
      - Mac/Linux: Use `ps aux | grep java` and `kill <PID>`
+   - If process termination doesn't work, restart your computer
    - This issue should auto-resolve in most cases with the latest version
 
 ### Logs Location
@@ -115,7 +124,7 @@ Available MCP tools:
 
 ## Contributing
 
-Contributions are welcome!
+Contributions, big or small, are welcome!
 
 ## License
 
