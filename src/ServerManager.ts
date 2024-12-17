@@ -1,6 +1,7 @@
 import { spawn, ChildProcess } from 'child_process';
 import { EventEmitter } from 'events';
 import { MinecraftServerConfig } from './types/config.js';
+import * as fs from 'fs';
 
 export class ServerManager extends EventEmitter {
   private process: ChildProcess | null = null;
@@ -36,6 +37,11 @@ export class ServerManager extends EventEmitter {
 
     return new Promise((resolve, reject) => {
       try {
+        if (!fs.existsSync(this.config.serverJarPath)) {
+          reject(new Error(`Server JAR not found at path: ${this.config.serverJarPath}`));
+          return;
+        }
+
         this.process = spawn('java', [
           `-Xmx${this.config.memoryAllocation}`,
           `-Xms${this.config.memoryAllocation}`,
@@ -44,18 +50,28 @@ export class ServerManager extends EventEmitter {
           'nogui'
         ]);
 
+        const timeout = setTimeout(() => {
+          reject(new Error('Server startup timed out'));
+          this.stop();
+        }, 60000);
+
         this.process.stdout?.on('data', (data: Buffer) => {
           const message = data.toString();
           this.emit('log', message);
           
           if (message.includes('Done')) {
+            clearTimeout(timeout);
             this.isRunning = true;
             resolve();
           }
         });
 
         this.process.stderr?.on('data', (data: Buffer) => {
-          this.emit('error', data.toString());
+          const error = data.toString();
+          this.emit('error', error);
+          if (error.includes('Error')) {
+            reject(new Error(error));
+          }
         });
 
         this.process.on('close', (code) => {

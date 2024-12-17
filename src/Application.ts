@@ -4,12 +4,17 @@ import { ProtocolHandler } from "./ProtocolHandler.js";
 import { MCPHandler } from "./MCPHandler.js";
 import path from 'path';
 
+interface ApplicationConfig {
+  serverJarPath: string;
+}
+
 export class Application {
   private serverManager: ServerManager;
   private protocolHandler: ProtocolHandler;
   private mcpHandler: MCPHandler;
+  private transport: StdioServerTransport | null = null;
 
-  constructor() {
+  constructor(config: ApplicationConfig) {
     // Initialize with default config
     this.serverManager = new ServerManager({
       maxPlayers: 10,
@@ -73,8 +78,8 @@ export class Application {
 
       // Start MCP server
       console.log('Starting MCP server...');
-      const transport = new StdioServerTransport();
-      await this.mcpHandler.getServer().connect(transport);
+      this.transport = new StdioServerTransport();
+      await this.mcpHandler.getServer().connect(this.transport);
       console.log('MCP server ready');
 
     } catch (error) {
@@ -84,7 +89,16 @@ export class Application {
     }
   }
 
-  private async shutdown(): Promise<void> {
+  public async shutdown(): Promise<void> {
+    console.log('Shutting down...');
+    
+    // Add MCP server shutdown
+    if (this.mcpHandler && this.transport) {
+      console.log('Stopping MCP server...');
+      // Assuming no disconnect method, handle cleanup here if needed
+      this.transport = null;
+    }
+    
     console.log('Disconnecting bot...');
     await this.protocolHandler.disconnect();
 
