@@ -36,15 +36,17 @@ export class ProtocolHandler extends EventEmitter {
           version: this.config.version
         });
 
-        // Load the pathfinder plugin
-        this.bot.loadPlugin(pathfinder);
-
-        // Add default movements configuration
-        this.bot.pathfinder.setMovements(new Movements(this.bot));
-
-        this.setupEventHandlers();
-
+        // Wait for bot to spawn before setting up pathfinder
         this.bot.once('spawn', () => {
+          // Load the pathfinder plugin
+          this.bot?.loadPlugin(pathfinder);
+          
+          // Add default movements configuration after pathfinder is loaded
+          if (this.bot?.pathfinder) {
+            this.bot.pathfinder.setMovements(new Movements(this.bot));
+          }
+
+          this.setupEventHandlers();
           this.emit('connected');
           resolve();
         });
@@ -99,12 +101,19 @@ export class ProtocolHandler extends EventEmitter {
     if (!this.bot) return;
     
     return new Promise((resolve) => {
-      this.bot?.once('end', () => {
+      const bot = this.bot;
+      if (!bot) {
+        resolve();
+        return;
+      }
+
+      bot.once('end', () => {
         this.bot = null;
         resolve();
       });
       
-      this.bot?.quit();
+      // Use end() instead of quit()
+      bot.end();
     });
   }
 
