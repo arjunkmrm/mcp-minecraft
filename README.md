@@ -4,10 +4,6 @@ A Model Context Protocol (MCP) integration for Minecraft that enables AI assista
 
 ![Screenshot](/public/screenshot.png?quality=medium)
 
-## How it works (sort of)
-
-![MCP Minecraft](/public/overview.jpeg?quality=low)
-
 ## Prerequisites
 
 1. Minecraft Java Edition v1.21
