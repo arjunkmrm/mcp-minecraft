@@ -12,7 +12,7 @@ A Model Context Protocol (MCP) integration for Minecraft that enables AI assista
 
 ## Installation Steps
 
-> 🚀 Quick Setup: Visit [smithery.ai](https://smithery.ai) for automated installation (coming soon)
+> Quick Setup: [smithery.ai](https://smithery.ai) (coming soon)
 
 1. **Download and Setup Minecraft Server**
    - Download Minecraft server v1.21 from [mcversions.net/1.21](https://mcversions.net/download/1.21)
