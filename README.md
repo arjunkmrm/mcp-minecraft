@@ -2,6 +2,10 @@
 
 A Model Context Protocol (MCP) integration for Minecraft that enables AI assistants to interact with a Minecraft server. This integration allows AI models to observe and interact with the Minecraft world through a bot.
 
+## How it works (sort of)
+
+![MCP Minecraft](/public/img.jpeg)
+
 ## Prerequisites
 
 1. Minecraft Java Edition v1.21
