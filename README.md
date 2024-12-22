@@ -14,15 +14,21 @@ A Model Context Protocol (MCP) integration for Minecraft that enables AI assista
 
 ## Installation Steps
 
-> Quick Setup: [smithery.ai](https://smithery.ai) (coming soon)
-
 1. **Download and Setup Minecraft Server**
    - Download Minecraft server v1.21 from [mcversions.net/1.21](https://mcversions.net/download/1.21)
    - Create a dedicated directory (e.g., `~/minecraft-server/`)
    - Place the downloaded `server.jar` file in this directory
    - Note down the absolute path to your `server.jar` file
 
-2. **Configure Claude Desktop**
+2. **Install and Configure MCP Integration**
+   
+   Quick Install (Recommended):
+   ```bash
+   npx -y @smithery/cli install mcp-minecraft --client claude
+   ```
+   Follow the CLI prompts to complete the setup.
+
+   Or Manual Setup:
    - Install Claude Desktop
    - Navigate to `~/Library/Application Support/Claude/claude_desktop_config.json`
    - Add the MCP server configuration:   
@@ -43,10 +49,10 @@ A Model Context Protocol (MCP) integration for Minecraft that enables AI assista
    ```
    > ⚠️ Replace `/absolute/path/to/minecraft-server/server.jar` with your actual server.jar path
 
-3. **Launch Claude Desktop**
+4. **Launch Claude Desktop**
    - Start Claude Desktop after completing the configuration
 
-4. **Connect to Server**
+5. **Connect to Server**
    - Launch Minecraft Java Edition
    - Select "Multiplayer"
    - Click "Add Server"
