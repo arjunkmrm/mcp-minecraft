@@ -29,7 +29,6 @@ A Model Context Protocol (MCP) integration for Minecraft that enables AI assista
    Follow the CLI prompts to complete the setup.
 
    Or Manual Setup:
-   - Install Claude Desktop
    - Navigate to `~/Library/Application Support/Claude/claude_desktop_config.json`
    - Add the MCP server configuration:   
    ```json
