@@ -39,7 +39,6 @@ export class ServerManager extends EventEmitter {
 
     // Create or update eula.txt
     fs.writeFileSync(eulaPath, 'eula=true', 'utf8');
-    this.emit('log', 'EULA accepted automatically');
   }
 
   private ensureServerProperties(): void {
@@ -80,7 +79,6 @@ export class ServerManager extends EventEmitter {
     }
 
     fs.writeFileSync(propsPath, properties.trim(), 'utf8');
-    this.emit('log', 'Server properties updated for peaceful plains world');
   }
 
   private normalizePath(p: string): string {
@@ -140,7 +138,6 @@ export class ServerManager extends EventEmitter {
 
         this.process.stdout?.on('data', (data: Buffer) => {
           const message = data.toString();
-          this.emit('log', message);
           
           if (message.includes('Done')) {
             clearTimeout(timeout);
@@ -151,7 +148,6 @@ export class ServerManager extends EventEmitter {
 
         this.process.stderr?.on('data', (data: Buffer) => {
           const error = data.toString();
-          this.emit('error', error);
           if (error.includes('Error')) {
             reject(new Error(error));
           }
@@ -159,7 +155,6 @@ export class ServerManager extends EventEmitter {
 
         this.process.on('close', (code) => {
           this.isRunning = false;
-          this.emit('stopped', code);
         });
 
         this.process.on('error', (err) => {
