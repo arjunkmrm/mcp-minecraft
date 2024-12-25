@@ -12,6 +12,13 @@ A Model Context Protocol (MCP) integration for Minecraft that enables AI assista
 
 > ⚠️ Note: Currently only tested on macOS/Linux. Windows compatibility is not guaranteed.
 
+## Important Note
+
+1. Use the F3+P Shortcut (Java Edition):
+If you're playing Java Edition on PC, press F3 + P together. This toggles the "Pause on Lost Focus" feature. Once turned off, you can switch to another claude desktop and Minecraft will continue running without pausing.
+
+![Focus Settings](/public/focus.png)
+
 ## Installation Steps
 
 1. **Download and Setup Minecraft Server**
