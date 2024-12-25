@@ -6,7 +6,7 @@ A Model Context Protocol (MCP) integration for Minecraft that enables AI assista
 
 ## Prerequisites
 
-1. Minecraft Java Edition v1.21
+1. Minecraft Launcher
 2. Node.js 18 or higher
 3. Claude Desktop App
 
@@ -59,8 +59,9 @@ Press F3 + P together. This toggles the "Pause on Lost Focus" feature. Once turn
    - Start Claude Desktop after completing the configuration
 
 5. **Connect to Server**
-   - Launch Minecraft Java Edition
-   - Select "Multiplayer"
+   - Open Minecraft Launcher
+   - Install and launch Minecraft Java Edition **v1.21**
+   - Click "Play" and Select "Multiplayer"
    - Click "Add Server"
    - Enter server details:
      - Server Name: `Minecraft Server`
