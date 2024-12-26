@@ -4,24 +4,20 @@ import { MinecraftServerConfig } from './types/config.js';
 import * as fs from 'fs';
 import path from 'path';
 import * as os from 'os';
-import { createLogger } from './logger.js';
 
 export class ServerManager extends EventEmitter {
   private process: ChildProcess | null = null;
   private config: MinecraftServerConfig;
   private isRunning: boolean = false;
-  private logger = createLogger('ServerManager');
 
   constructor(config: MinecraftServerConfig) {
     super();
     this.config = this.validateConfig(config);
     
-    // Add process exit handler
     process.on('exit', () => {
       this.killProcess();
     });
 
-    // Handle SIGTERM and SIGINT
     process.on('SIGTERM', () => {
       this.killProcess();
     });
@@ -34,12 +30,9 @@ export class ServerManager extends EventEmitter {
   private killProcess(): void {
     if (this.process) {
       try {
-        this.logger.info('Force killing server process...');
-        // Force kill the process and all children
         process.kill(-this.process.pid!, 'SIGKILL');
       } catch (error) {
         // Ignore errors during force kill
-        this.logger.error(`Error during force kill: ${error}`);
       }
       this.process = null;
       this.isRunning = false;
@@ -149,8 +142,6 @@ export class ServerManager extends EventEmitter {
         this.ensureEulaAccepted();
         this.ensureServerProperties();
 
-        this.logger.info(`Starting Minecraft server in ${serverDir}`);
-
         this.process = spawn('java', [
           `-Xmx${this.config.memoryAllocation}`,
           `-Xms${this.config.memoryAllocation}`,
@@ -171,7 +162,6 @@ export class ServerManager extends EventEmitter {
 
         this.process.stdout?.on('data', (data: Buffer) => {
           const message = data.toString();
-          this.logger.info(`[Server] ${message.trim()}`);
           
           if (message.includes('Done')) {
             clearTimeout(timeout);
@@ -182,7 +172,6 @@ export class ServerManager extends EventEmitter {
 
         this.process.stderr?.on('data', (data: Buffer) => {
           const error = data.toString();
-          this.logger.error(`[Server Error] ${error.trim()}`);
           if (error.includes('Error')) {
             reject(new Error(error));
           }
@@ -190,17 +179,14 @@ export class ServerManager extends EventEmitter {
 
         this.process.on('close', (code) => {
           this.isRunning = false;
-          this.logger.info(`Server process closed with code ${code}`);
         });
 
         this.process.on('error', (err) => {
           this.isRunning = false;
-          this.logger.error(`Server process error: ${err.message}`);
           reject(err);
         });
 
       } catch (error) {
-        this.logger.error(`Failed to start server: ${error}`);
         reject(error);
       }
     });
@@ -212,24 +198,18 @@ export class ServerManager extends EventEmitter {
     }
 
     return new Promise((resolve) => {
-      this.logger.info('Stopping server...');
-      
-      // Add timeout to force kill if graceful shutdown fails
       const forceKillTimeout = setTimeout(() => {
-        this.logger.warn('Server not responding to stop command, force killing...');
         this.killProcess();
         resolve();
-      }, 10000); // 10 second timeout
+      }, 10000);
 
       this.process?.once('close', () => {
         clearTimeout(forceKillTimeout);
         this.isRunning = false;
         this.process = null;
-        this.logger.info('Server stopped successfully');
         resolve();
       });
       
-      // Try graceful shutdown first
       if (this.process?.stdin) {
         this.process.stdin.write('stop\n');
       } else {

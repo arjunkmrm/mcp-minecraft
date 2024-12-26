@@ -2,7 +2,6 @@ import * as mineflayer from 'mineflayer';
 import { EventEmitter } from 'events';
 import { Vec3 } from 'vec3';
 import pathfinderPkg from 'mineflayer-pathfinder';
-import { createLogger } from './logger.js';
 const { pathfinder, Movements, goals } = pathfinderPkg;
 
 export interface BotConfig {
@@ -15,7 +14,6 @@ export interface BotConfig {
 export class ProtocolHandler extends EventEmitter {
   private bot: mineflayer.Bot | null = null;
   private config: BotConfig;
-  private logger = createLogger('ProtocolHandler');
 
   constructor(config: BotConfig) {
     super();
@@ -27,8 +25,6 @@ export class ProtocolHandler extends EventEmitter {
       throw new Error('Bot is already connected');
     }
 
-    this.logger.info(`Connecting with version: ${this.config.version}`);
-
     return new Promise((resolve, reject) => {
       try {
         this.bot = mineflayer.createBot({
@@ -38,30 +34,24 @@ export class ProtocolHandler extends EventEmitter {
           version: this.config.version
         });
 
-        // Wait for bot to spawn before setting up pathfinder
         this.bot.once('spawn', () => {
-          // Load the pathfinder plugin
           this.bot?.loadPlugin(pathfinder);
           
-          // Add default movements configuration after pathfinder is loaded
           if (this.bot?.pathfinder) {
             this.bot.pathfinder.setMovements(new Movements(this.bot));
           }
 
           this.setupEventHandlers();
           this.emit('connected');
-          this.logger.info('Bot spawned and connected successfully');
           resolve();
         });
 
         this.bot.on('error', (error) => {
-          this.logger.error(`Bot connection error: ${error}`);
           this.emit('error', error);
           reject(error);
         });
 
       } catch (error) {
-        this.logger.error(`Failed to create bot: ${error}`);
         reject(error);
       }
     });
@@ -71,31 +61,25 @@ export class ProtocolHandler extends EventEmitter {
     if (!this.bot) return;
 
     this.bot.on('chat', (username, message) => {
-      this.logger.info(`Chat message from ${username}: ${message}`);
       this.emit('chat', { username, message });
     });
 
     this.bot.on('kicked', (reason) => {
-      this.logger.error(`Bot was kicked: ${reason}`);
       this.emit('kicked', reason);
     });
 
     this.bot.on('error', (error) => {
-      this.logger.error(`Bot error: ${error}`);
       this.emit('error', error);
     });
   }
 
-  // Bot actions
   public async sendChat(message: string): Promise<void> {
     if (!this.bot) throw new Error('Bot not connected');
-    this.logger.info(`Sending chat message: ${message}`);
     await this.bot.chat(message);
   }
 
   public async jump(): Promise<void> {
     if (!this.bot) throw new Error('Bot not connected');
-    this.logger.info('Executing jump command');
     this.bot.setControlState('jump', true);
     setTimeout(() => {
       if (this.bot) this.bot.setControlState('jump', false);
@@ -116,17 +100,12 @@ export class ProtocolHandler extends EventEmitter {
         resolve();
         return;
       }
-
-      this.logger.info('Disconnecting bot...');
       
-      // Ensure we remove all listeners to prevent memory leaks
       bot.removeAllListeners();
       
       bot.once('end', () => {
         this.bot = null;
-        this.logger.info('Bot disconnected successfully');
         
-        // Force quit the process after a short delay to ensure cleanup
         setTimeout(() => {
           process.exit(0);
         }, 1000);
@@ -134,7 +113,6 @@ export class ProtocolHandler extends EventEmitter {
         resolve();
       });
       
-      // Use end() instead of quit() for proper cleanup
       bot.end();
     });
   }
@@ -145,7 +123,6 @@ export class ProtocolHandler extends EventEmitter {
 
   public async moveForward(): Promise<void> {
     if (!this.bot) throw new Error('Bot not connected');
-    this.logger.info('Executing move forward command');
     this.bot.setControlState('forward', true);
     await new Promise(resolve => setTimeout(resolve, 1000));
     this.bot.setControlState('forward', false);
@@ -153,7 +130,6 @@ export class ProtocolHandler extends EventEmitter {
 
   public async moveBack(): Promise<void> {
     if (!this.bot) throw new Error('Bot not connected');
-    this.logger.info('Executing move back command');
     this.bot.setControlState('back', true);
     await new Promise(resolve => setTimeout(resolve, 1000));
     this.bot.setControlState('back', false);
@@ -161,7 +137,6 @@ export class ProtocolHandler extends EventEmitter {
 
   public async turnLeft(): Promise<void> {
     if (!this.bot) throw new Error('Bot not connected');
-    this.logger.info('Executing turn left command');
     this.bot.setControlState('left', true);
     await new Promise(resolve => setTimeout(resolve, 500));
     this.bot.setControlState('left', false);
@@ -169,7 +144,6 @@ export class ProtocolHandler extends EventEmitter {
 
   public async turnRight(): Promise<void> {
     if (!this.bot) throw new Error('Bot not connected');
-    this.logger.info('Executing turn right command');
     this.bot.setControlState('right', true);
     await new Promise(resolve => setTimeout(resolve, 500));
     this.bot.setControlState('right', false);
@@ -179,7 +153,6 @@ export class ProtocolHandler extends EventEmitter {
     if (!this.bot) throw new Error('Bot not connected');
     
     try {
-      this.logger.info(`Attempting to place block at (${x}, ${y}, ${z})`);
       const targetPos = new Vec3(x, y, z);
       const faceVector = new Vec3(0, 1, 0);
       
@@ -187,9 +160,7 @@ export class ProtocolHandler extends EventEmitter {
       if (!referenceBlock) throw new Error('No reference block found');
       
       await this.bot.placeBlock(referenceBlock, faceVector);
-      this.logger.info('Block placed successfully');
     } catch (error) {
-      this.logger.error(`Failed to place block: ${error}`);
       throw new Error(`Failed to place block: ${error}`);
     }
   }

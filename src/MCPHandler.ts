@@ -7,12 +7,10 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { ProtocolHandler } from "./ProtocolHandler.js";
 import { ReadResourceRequest, CallToolRequest } from '@modelcontextprotocol/sdk/types.js';
-import { createLogger } from './logger.js';
 
 export class MCPHandler {
   private server: Server;
   private protocolHandler: ProtocolHandler;
-  private logger = createLogger('MCPHandler');
 
   constructor(protocolHandler: ProtocolHandler) {
     this.protocolHandler = protocolHandler;
@@ -55,7 +53,6 @@ export class MCPHandler {
           ]
         };
       } catch (error) {
-        this.logger.error(`Resource listing failed: ${error}`);
         throw error;
       }
     });
@@ -97,7 +94,6 @@ export class MCPHandler {
             throw new Error(`Unknown resource: ${request.params.uri}`);
         }
       } catch (error) {
-        this.logger.error(`Resource read failed: ${error}`);
         throw error;
       }
     });
@@ -341,7 +337,6 @@ export class MCPHandler {
           ]
         };
       } catch (error) {
-        this.logger.error(`Tool listing failed: ${error}`);
         throw error;
       }
     });
@@ -349,7 +344,6 @@ export class MCPHandler {
     // Handle tool calls
     this.server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest) => {
       try {
-        this.logger.info(`Executing tool: ${request.params.name}`);
         switch (request.params.name) {
           case "chat":
             if (request.params.arguments && request.params.arguments.message) {
@@ -523,7 +517,6 @@ export class MCPHandler {
             throw new Error(`Unknown tool: ${request.params.name}`);
         }
       } catch (error) {
-        this.logger.error(`Tool call failed for ${request.params.name}: ${error}`);
         throw error;
       }
     });
