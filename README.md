@@ -133,7 +133,6 @@ Available MCP tools:
       - Windows: Use Task Manager (untested)
       - Mac/Linux: 
          - Go to 'Activity Monitor' and 'Force Quit' java
-         - `ps aux | grep java` and `kill <PID>`
    - Restart computer if process termination fails
    - Note: Latest version should auto-resolve these issues
 
