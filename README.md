@@ -20,6 +20,9 @@ Press F3 + P together. This toggles the "Pause on Lost Focus" feature. Once turn
 
 ![Focus Settings](/public/focus.png)
 
+2. **Connection Issues on Claude Restart**:
+If you restart Claude while the Minecraft server is running, you may experience MCP connection issues on the next claude launch due to lingering java process. See [Troubleshooting: MCP Connection Failed](#common-issues) for resolution steps.
+
 ## Installation Steps
 
 1. **Download and Setup Minecraft Server**
@@ -125,20 +128,17 @@ Available MCP tools:
    - Check firewall settings
 
 3. **MCP Connection Failed**
-   - Restart Claude Desktop
-   - Verify config.json syntax
-   - Check server.jar path is absolute
-
-4. **Java Process Persists After Closing**
-   - If you experience issues reconnecting after closing Claude, check for lingering Java processes
-   - You may need to manually terminate the Java process:
-     - Windows: Use Task Manager (untested)
-     - Mac/Linux: Use `ps aux | grep java` and `kill <PID>`
-   - If process termination doesn't work, restart your computer
-   - This issue should auto-resolve in most cases with the latest version
+   - Look for lingering Java processes
+   - Terminate them manually:
+      - Windows: Use Task Manager (untested)
+      - Mac/Linux: 
+         - Go to 'Activity Monitor' and 'Force Quit' java
+         - `ps aux | grep java` and `kill <PID>`
+   - Restart computer if process termination fails
+   - Note: Latest version should auto-resolve these issues
 
 ### Logs Location
-- Server logs: Check the minecraft-server directory
+- Minecraft Server logs: Check the minecraft-server directory
 - Claude Desktop logs: `~/Library/Logs/Claude/mcp*.log`
 
 ## Contributing
