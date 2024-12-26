@@ -117,17 +117,7 @@ Available MCP tools:
 
 ### Common Issues
 
-1. **Server Won't Start**
-   - Verify Java is installed
-   - Check server.jar path is correct
-   - Ensure port 25565 is available
-
-2. **Can't Connect to Server**
-   - Verify server is running (check logs)
-   - Confirm you're using "localhost" as server address
-   - Check firewall settings
-
-3. **MCP Connection Failed**
+1. **MCP Connection Failed**
    - Look for lingering Java processes
    - Terminate them manually:
       - Windows: Use Task Manager (untested)
@@ -135,6 +125,16 @@ Available MCP tools:
          - Go to 'Activity Monitor' and 'Force Quit' java
    - Restart computer if process termination fails
    - Note: Latest version should auto-resolve these issues
+
+2. **Server Won't Start**
+   - Verify Java is installed
+   - Check server.jar path is correct
+   - Ensure port 25565 is available
+
+3. **Can't Connect to Server**
+   - Verify server is running (check logs)
+   - Confirm you're using "localhost" as server address
+   - Check firewall settings
 
 ### Logs Location
 - Minecraft Server logs: Check the minecraft-server directory
