@@ -118,7 +118,8 @@ export class ServerManager extends EventEmitter {
         this.ensureEulaAccepted();
         this.ensureServerProperties();
 
-        // Use absolute paths and set proper working directory
+        process.stderr.write(`Starting Minecraft server in ${serverDir}\n`);
+
         this.process = spawn('java', [
           `-Xmx${this.config.memoryAllocation}`,
           `-Xms${this.config.memoryAllocation}`,
@@ -128,7 +129,7 @@ export class ServerManager extends EventEmitter {
         ], {
           cwd: serverDir,
           stdio: ['pipe', 'pipe', 'pipe'],
-          detached: false // Ensure process is attached to parent
+          detached: false
         });
 
         const timeout = setTimeout(() => {
@@ -138,6 +139,7 @@ export class ServerManager extends EventEmitter {
 
         this.process.stdout?.on('data', (data: Buffer) => {
           const message = data.toString();
+          process.stderr.write(`[Server] ${message}`);
           
           if (message.includes('Done')) {
             clearTimeout(timeout);
@@ -148,6 +150,7 @@ export class ServerManager extends EventEmitter {
 
         this.process.stderr?.on('data', (data: Buffer) => {
           const error = data.toString();
+          process.stderr.write(`[Server Error] ${error}`);
           if (error.includes('Error')) {
             reject(new Error(error));
           }
@@ -155,14 +158,17 @@ export class ServerManager extends EventEmitter {
 
         this.process.on('close', (code) => {
           this.isRunning = false;
+          process.stderr.write(`[Server] Process closed with code ${code}\n`);
         });
 
         this.process.on('error', (err) => {
           this.isRunning = false;
+          process.stderr.write(`[Server Error] ${err.message}\n`);
           reject(err);
         });
 
       } catch (error) {
+        process.stderr.write(`[Server Error] ${error}\n`);
         reject(error);
       }
     });
@@ -174,8 +180,11 @@ export class ServerManager extends EventEmitter {
     }
 
     return new Promise((resolve) => {
+      process.stderr.write('[Server] Stopping server...\n');
+      
       this.process?.once('close', () => {
         this.isRunning = false;
+        process.stderr.write('[Server] Server stopped\n');
         resolve();
       });
       

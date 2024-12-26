@@ -9,6 +9,7 @@ A Model Context Protocol (MCP) integration for Minecraft that enables AI assista
 1. Minecraft Launcher
 2. Node.js 18 or higher
 3. Claude Desktop App
+4. Java 21.0.5 (recommended)
 
 > ⚠️ Note: Currently only tested on macOS/Linux. Windows compatibility is not guaranteed.
 
@@ -23,6 +24,7 @@ Press F3 + P together. This toggles the "Pause on Lost Focus" feature. Once turn
 
 1. **Download and Setup Minecraft Server**
    - Download Minecraft server v1.21 from [mcversions.net/1.21](https://mcversions.net/download/1.21)
+   - Install Java 21.0.5 if not already installed (other versions are untested)
    - Create a dedicated directory (e.g., `~/minecraft-server/`)
    - Place the downloaded `server.jar` file in this directory
    - Note down the absolute path to your `server.jar` file

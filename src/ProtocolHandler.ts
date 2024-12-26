@@ -25,7 +25,7 @@ export class ProtocolHandler extends EventEmitter {
       throw new Error('Bot is already connected');
     }
 
-    console.log('Connecting with version:', this.config.version);
+    process.stderr.write(`Connecting with version: ${this.config.version}\n`);
 
     return new Promise((resolve, reject) => {
       try {

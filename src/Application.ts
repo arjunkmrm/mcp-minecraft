@@ -41,23 +41,23 @@ export class Application {
 
   private setupEventHandlers(): void {
     this.serverManager.on('log', (message) => {
-      console.log('[Server]', message);
+      process.stderr.write(`[Server] ${message}\n`);
     });
 
     this.serverManager.on('error', (error) => {
-      console.error('[Server Error]', error);
+      process.stderr.write(`[Server Error] ${error}\n`);
     });
 
     this.protocolHandler.on('chat', ({ username, message }) => {
-      console.log('[Chat]', `${username}: ${message}`);
+      process.stderr.write(`[Chat] ${username}: ${message}\n`);
     });
 
     this.protocolHandler.on('error', (error) => {
-      console.error('[Bot Error]', error);
+      process.stderr.write(`[Bot Error] ${error}\n`);
     });
 
     process.on('SIGINT', async () => {
-      console.log('\nShutting down...');
+      process.stderr.write('\nShutting down...\n');
       await this.shutdown();
       process.exit(0);
     });
@@ -65,46 +65,46 @@ export class Application {
 
   public async start(): Promise<void> {
     try {
-      // Start Minecraft server
-      console.log('Starting Minecraft server...');
-      await this.serverManager.start();
-      console.log('Minecraft server started successfully');
-
-      // Wait a bit for the server to initialize
-      await new Promise(resolve => setTimeout(resolve, 5000));
-
-      // Connect bot
-      console.log('Connecting bot to server...');
-      await this.protocolHandler.connect();
-      console.log('Bot connected successfully');
-
-      // Start MCP server
+      // Start MCP server first
       console.log('Starting MCP server...');
       this.transport = new StdioServerTransport();
       await this.mcpHandler.getServer().connect(this.transport);
       console.log('MCP server ready');
 
+      // Start Minecraft server
+      process.stderr.write('Starting Minecraft server...\n');
+      await this.serverManager.start();
+      process.stderr.write('Minecraft server started successfully\n');
+
+      // Wait a bit for the server to initialize
+      await new Promise(resolve => setTimeout(resolve, 5000));
+
+      // Connect bot
+      process.stderr.write('Connecting bot to server...\n');
+      await this.protocolHandler.connect();
+      process.stderr.write('Bot connected successfully\n');
+
     } catch (error) {
-      console.error('Failed to start:', error);
+      process.stderr.write(`Failed to start: ${error}\n`);
       await this.shutdown();
       process.exit(1);
     }
   }
 
   public async shutdown(): Promise<void> {
-    console.log('Shutting down...');
+    process.stderr.write('Shutting down...\n');
     
     // Add MCP server shutdown
     if (this.mcpHandler && this.transport) {
-      console.log('Stopping MCP server...');
+      process.stderr.write('Stopping MCP server...\n');
       // Assuming no disconnect method, handle cleanup here if needed
       this.transport = null;
     }
     
-    console.log('Disconnecting bot...');
+    process.stderr.write('Disconnecting bot...\n');
     await this.protocolHandler.disconnect();
 
-    console.log('Stopping Minecraft server...');
+    process.stderr.write('Stopping Minecraft server...\n');
     await this.serverManager.stop();
   }
 
@@ -112,22 +112,22 @@ export class Application {
     try {
       // Disconnect MCP server
       if (this.mcpHandler && this.transport) {
-        console.log('Stopping MCP server...');
+        process.stderr.write('Stopping MCP server...\n');
         await this.mcpHandler.getServer().close();
         this.transport = null;
       }
 
       // Disconnect bot
-      console.log('Disconnecting bot...');
+      process.stderr.write('Disconnecting bot...\n');
       await this.protocolHandler.disconnect();
 
       // Stop Minecraft server
-      console.log('Stopping Minecraft server...');
+      process.stderr.write('Stopping Minecraft server...\n');
       await this.serverManager.stop();
 
-      console.log('Cleanup complete');
+      process.stderr.write('Cleanup complete\n');
     } catch (error) {
-      console.error('Error during cleanup:', error);
+      process.stderr.write(`Error during cleanup: ${error}\n`);
       throw error;
     }
   }
