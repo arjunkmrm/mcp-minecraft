@@ -4,11 +4,13 @@ import { MinecraftServerConfig } from './types/config.js';
 import * as fs from 'fs';
 import path from 'path';
 import * as os from 'os';
+import { createLogger } from './logger.js';
 
 export class ServerManager extends EventEmitter {
   private process: ChildProcess | null = null;
   private config: MinecraftServerConfig;
   private isRunning: boolean = false;
+  private logger = createLogger('ServerManager');
 
   constructor(config: MinecraftServerConfig) {
     super();
@@ -29,14 +31,15 @@ export class ServerManager extends EventEmitter {
     });
   }
 
-  // Add new method to forcefully kill the process
   private killProcess(): void {
     if (this.process) {
       try {
+        this.logger.info('Force killing server process...');
         // Force kill the process and all children
         process.kill(-this.process.pid!, 'SIGKILL');
       } catch (error) {
         // Ignore errors during force kill
+        this.logger.error(`Error during force kill: ${error}`);
       }
       this.process = null;
       this.isRunning = false;
@@ -146,9 +149,8 @@ export class ServerManager extends EventEmitter {
         this.ensureEulaAccepted();
         this.ensureServerProperties();
 
-        process.stderr.write(`Starting Minecraft server in ${serverDir}\n`);
+        this.logger.info(`Starting Minecraft server in ${serverDir}`);
 
-        // Add detached: true and create new process group
         this.process = spawn('java', [
           `-Xmx${this.config.memoryAllocation}`,
           `-Xms${this.config.memoryAllocation}`,
@@ -159,7 +161,6 @@ export class ServerManager extends EventEmitter {
           cwd: serverDir,
           stdio: ['pipe', 'pipe', 'pipe'],
           detached: true,
-          // Create new process group on Unix systems
           ...(process.platform !== 'win32' && { pid: true })
         });
 
@@ -170,7 +171,7 @@ export class ServerManager extends EventEmitter {
 
         this.process.stdout?.on('data', (data: Buffer) => {
           const message = data.toString();
-          process.stderr.write(`[Server] ${message}`);
+          this.logger.info(`[Server] ${message.trim()}`);
           
           if (message.includes('Done')) {
             clearTimeout(timeout);
@@ -181,7 +182,7 @@ export class ServerManager extends EventEmitter {
 
         this.process.stderr?.on('data', (data: Buffer) => {
           const error = data.toString();
-          process.stderr.write(`[Server Error] ${error}`);
+          this.logger.error(`[Server Error] ${error.trim()}`);
           if (error.includes('Error')) {
             reject(new Error(error));
           }
@@ -189,17 +190,17 @@ export class ServerManager extends EventEmitter {
 
         this.process.on('close', (code) => {
           this.isRunning = false;
-          process.stderr.write(`[Server] Process closed with code ${code}\n`);
+          this.logger.info(`Server process closed with code ${code}`);
         });
 
         this.process.on('error', (err) => {
           this.isRunning = false;
-          process.stderr.write(`[Server Error] ${err.message}\n`);
+          this.logger.error(`Server process error: ${err.message}`);
           reject(err);
         });
 
       } catch (error) {
-        process.stderr.write(`[Server Error] ${error}\n`);
+        this.logger.error(`Failed to start server: ${error}`);
         reject(error);
       }
     });
@@ -211,11 +212,11 @@ export class ServerManager extends EventEmitter {
     }
 
     return new Promise((resolve) => {
-      process.stderr.write('[Server] Stopping server...\n');
+      this.logger.info('Stopping server...');
       
       // Add timeout to force kill if graceful shutdown fails
       const forceKillTimeout = setTimeout(() => {
-        process.stderr.write('[Server] Force killing server process...\n');
+        this.logger.warn('Server not responding to stop command, force killing...');
         this.killProcess();
         resolve();
       }, 10000); // 10 second timeout
@@ -224,7 +225,7 @@ export class ServerManager extends EventEmitter {
         clearTimeout(forceKillTimeout);
         this.isRunning = false;
         this.process = null;
-        process.stderr.write('[Server] Server stopped\n');
+        this.logger.info('Server stopped successfully');
         resolve();
       });
       

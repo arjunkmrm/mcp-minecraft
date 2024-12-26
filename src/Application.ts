@@ -3,6 +3,7 @@ import { ServerManager } from "./ServerManager.js";
 import { ProtocolHandler } from "./ProtocolHandler.js";
 import { MCPHandler } from "./MCPHandler.js";
 import path from 'path';
+import { createLogger } from './logger.js'
 
 interface ApplicationConfig {
   serverJarPath: string;
@@ -13,6 +14,7 @@ export class Application {
   private protocolHandler: ProtocolHandler;
   private mcpHandler: MCPHandler;
   private transport: StdioServerTransport | null = null;
+  private logger = createLogger('Application');
 
   constructor(config: ApplicationConfig) {
     const serverPath = path.resolve(config.serverJarPath);
@@ -41,23 +43,23 @@ export class Application {
 
   private setupEventHandlers(): void {
     this.serverManager.on('log', (message) => {
-      process.stderr.write(`[Server] ${message}\n`);
+      this.logger.info(`[Server] ${message}`);
     });
 
     this.serverManager.on('error', (error) => {
-      process.stderr.write(`[Server Error] ${error}\n`);
+      this.logger.error(`[Server Error] ${error}`);
     });
 
     this.protocolHandler.on('chat', ({ username, message }) => {
-      process.stderr.write(`[Chat] ${username}: ${message}\n`);
+      this.logger.info(`[Chat] ${username}: ${message}`);
     });
 
     this.protocolHandler.on('error', (error) => {
-      process.stderr.write(`[Bot Error] ${error}\n`);
+      this.logger.error(`[Bot Error] ${error}`);
     });
 
     process.on('SIGINT', async () => {
-      process.stderr.write('\nShutting down...\n');
+      this.logger.info('Shutting down...');
       await this.shutdown();
       process.exit(0);
     });
@@ -65,46 +67,43 @@ export class Application {
 
   public async start(): Promise<void> {
     try {
-      // Start MCP server first
-      console.log('Starting MCP server...');
+      // Start MCP server first - use only stdout for MCP communication
       this.transport = new StdioServerTransport();
       await this.mcpHandler.getServer().connect(this.transport);
-      console.log('MCP server ready');
+      this.logger.info('MCP server ready');
 
       // Start Minecraft server
-      process.stderr.write('Starting Minecraft server...\n');
       await this.serverManager.start();
-      process.stderr.write('Minecraft server started successfully\n');
+      this.logger.info('Minecraft server started successfully');
 
       // Wait a bit for the server to initialize
       await new Promise(resolve => setTimeout(resolve, 5000));
 
       // Connect bot
-      process.stderr.write('Connecting bot to server...\n');
       await this.protocolHandler.connect();
-      process.stderr.write('Bot connected successfully\n');
+      this.logger.info('Bot connected successfully');
 
     } catch (error) {
-      process.stderr.write(`Failed to start: ${error}\n`);
+      this.logger.error(`Failed to start: ${error}`);
       await this.shutdown();
       process.exit(1);
     }
   }
 
   public async shutdown(): Promise<void> {
-    process.stderr.write('Shutting down...\n');
+    this.logger.info('Initiating shutdown sequence...');
     
     // Add MCP server shutdown
     if (this.mcpHandler && this.transport) {
-      process.stderr.write('Stopping MCP server...\n');
+      this.logger.info('Stopping MCP server...');
       // Assuming no disconnect method, handle cleanup here if needed
       this.transport = null;
     }
     
-    process.stderr.write('Disconnecting bot...\n');
+    this.logger.info('Disconnecting bot...');
     await this.protocolHandler.disconnect();
 
-    process.stderr.write('Stopping Minecraft server...\n');
+    this.logger.info('Stopping Minecraft server...');
     await this.serverManager.stop();
   }
 
@@ -112,22 +111,22 @@ export class Application {
     try {
       // Disconnect MCP server
       if (this.mcpHandler && this.transport) {
-        process.stderr.write('Stopping MCP server...\n');
+        this.logger.info('Stopping MCP server...');
         await this.mcpHandler.getServer().close();
         this.transport = null;
       }
 
       // Disconnect bot
-      process.stderr.write('Disconnecting bot...\n');
+      this.logger.info('Disconnecting bot...');
       await this.protocolHandler.disconnect();
 
       // Stop Minecraft server
-      process.stderr.write('Stopping Minecraft server...\n');
+      this.logger.info('Stopping Minecraft server...');
       await this.serverManager.stop();
 
-      process.stderr.write('Cleanup complete\n');
+      this.logger.info('Cleanup complete');
     } catch (error) {
-      process.stderr.write(`Error during cleanup: ${error}\n`);
+      this.logger.error(`Error during cleanup: ${error}`);
       throw error;
     }
   }
